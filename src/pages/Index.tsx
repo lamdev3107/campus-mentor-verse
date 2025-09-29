@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import TopBar from "@/components/TopBar";
 import DashboardStats from "@/components/DashboardStats";
 import CourseCard from "@/components/CourseCard";
 import RecentActivity from "@/components/RecentActivity";
@@ -72,10 +73,13 @@ const Index = () => {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-dashboard-bg">
-      <Header />
+    <div className="min-h-screen bg-dashboard-bg flex">
+      <Sidebar />
       
-      <main className="container mx-auto px-4 py-8">
+      <div className="flex-1 flex flex-col">
+        <TopBar />
+        
+        <main className="flex-1 p-6">
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -113,7 +117,8 @@ const Index = () => {
             <QuickActions />
           </div>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import TopBar from "@/components/TopBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -96,10 +97,13 @@ const StudyMaterials = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dashboard-bg">
-      <Header />
+    <div className="min-h-screen bg-dashboard-bg flex">
+      <Sidebar />
       
-      <main className="container mx-auto px-4 py-8">
+      <div className="flex-1 flex flex-col">
+        <TopBar />
+        
+        <main className="flex-1 p-6">
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -205,7 +209,8 @@ const StudyMaterials = () => {
             </p>
           </div>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
