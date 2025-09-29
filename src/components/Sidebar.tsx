@@ -1,19 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  GraduationCap, 
-  Home, 
-  BookOpen, 
-  Target, 
-  Calendar,
-  MessageSquare,
-  Users,
-  Settings,
-  Bell,
-  User,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
+import { GraduationCap, Chrome as Home, BookOpen, Target, Calendar, MessageSquare, Users, Settings, Bell, User, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
