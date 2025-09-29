@@ -1,18 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  GraduationCap, 
-  BookOpen, 
-  Users, 
-  Trophy, 
-  Star, 
-  Play, 
-  CheckCircle,
-  ArrowRight,
-  Menu,
-  X
-} from "lucide-react";
+import { GraduationCap, BookOpen, Users, Trophy, Star, Play, CircleCheck as CheckCircle, ArrowRight, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const Landing = () => {
