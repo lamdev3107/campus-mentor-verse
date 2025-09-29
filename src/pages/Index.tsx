@@ -1,8 +1,10 @@
+import { useState, useMemo } from "react";
 import Header from "@/components/Header";
 import DashboardStats from "@/components/DashboardStats";
 import CourseCard from "@/components/CourseCard";
 import RecentActivity from "@/components/RecentActivity";
 import QuickActions from "@/components/QuickActions";
+import CourseFilter from "@/components/CourseFilter";
 
 // Mock data for courses
 const courses = [
@@ -53,6 +55,22 @@ const courses = [
 ];
 
 const Index = () => {
+  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  
+  // Get unique categories from courses
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(courses.map(course => course.category))];
+    return uniqueCategories;
+  }, []);
+  
+  // Filter courses based on selected category
+  const filteredCourses = useMemo(() => {
+    if (selectedCategory === "Tất cả") {
+      return courses;
+    }
+    return courses.filter(course => course.category === selectedCategory);
+  }, [selectedCategory]);
+
   return (
     <div className="min-h-screen bg-dashboard-bg">
       <Header />
@@ -75,15 +93,15 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Courses Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-foreground">Khóa học của tôi</h2>
-              <button className="text-primary hover:text-primary/80 font-medium">
-                Xem tất cả
-              </button>
-            </div>
+            <CourseFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              courseCount={filteredCourses.length}
+            />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {courses.map((course) => (
+              {filteredCourses.map((course) => (
                 <CourseCard key={course.id} {...course} />
               ))}
             </div>
