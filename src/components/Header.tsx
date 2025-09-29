@@ -1,6 +1,7 @@
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, GraduationCap, BookOpen, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,16 +11,48 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
+  const location = useLocation();
+  
+  const navItems = [
+    { path: "/", label: "Trang chủ", icon: GraduationCap },
+    { path: "/study-materials", label: "Tài liệu", icon: BookOpen },
+    { path: "/exam-prep", label: "Ôn luyện thi", icon: Target },
+  ];
+
   return (
     <header className="bg-nav-bg text-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">LMS</span>
-            </div>
-            <h1 className="text-xl font-bold">UniLearn</h1>
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo and Navigation */}
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="flex items-center space-x-2">
+              <GraduationCap className="w-8 h-8 text-primary-foreground" />
+              <span className="text-xl font-bold text-primary-foreground">
+                EduPortal
+              </span>
+            </Link>
+            
+            {/* Navigation Menu */}
+            <nav className="hidden md:flex items-center space-x-6">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                      isActive
+                        ? "text-accent bg-primary-foreground/10"
+                        : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/5"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
 
           {/* Search Bar */}
