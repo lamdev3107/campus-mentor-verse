@@ -34,24 +34,15 @@ const Header = () => {
             
             {/* Navigation Menu */}
             <nav className="hidden md:flex items-center space-x-6">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                      isActive
-                        ? "text-accent bg-primary-foreground/10"
-                        : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/5"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+              <Link to="/study-materials" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                Tài liệu học tập
+              </Link>
+              <Link to="/online-learning" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                Học trực tuyến
+              </Link>
+              <Link to="/exam-prep" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                Ôn luyện thi
+              </Link>
             </nav>
           </div>
 

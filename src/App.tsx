@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import StudyMaterials from "./pages/StudyMaterials";
 import ExamPrep from "./pages/ExamPrep";
+import OnlineLearning from "./pages/OnlineLearning";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/dashboard" element={<Index />} />
           <Route path="/study-materials" element={<StudyMaterials />} />
           <Route path="/exam-prep" element={<ExamPrep />} />
+          <Route path="/online-learning" element={<OnlineLearning />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
