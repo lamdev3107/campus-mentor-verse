@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import StudyMaterials from "./pages/StudyMaterials";
 import ExamPrep from "./pages/ExamPrep";
 import OnlineLearning from "./pages/OnlineLearning";
+import CourseDetail from "./pages/CourseDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/study-materials" element={<StudyMaterials />} />
           <Route path="/exam-prep" element={<ExamPrep />} />
           <Route path="/online-learning" element={<OnlineLearning />} />
+          <Route path="/course/:id" element={<CourseDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
