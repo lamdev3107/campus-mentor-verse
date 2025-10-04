@@ -1,280 +1,539 @@
 import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Play, 
-  Pause, 
-  Volume2, 
-  Settings, 
-  Maximize,
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  BookmarkPlus,
+  MessageSquare,
+  BookOpen,
   Clock,
-  Users,
-  Star,
-  CheckCircle,
-  PlayCircle
+  Edit,
+  Trash2,
+  HelpCircle,
 } from "lucide-react";
 
-const mockCourses = [
-  {
-    id: 1,
-    title: "Lập trình Web với React",
-    instructor: "TS. Nguyễn Văn A",
-    thumbnail: "/placeholder.svg",
-    totalVideos: 24,
-    completedVideos: 8,
-    totalDuration: "12 giờ 30 phút",
-    rating: 4.8,
-    students: 256,
-    videos: [
-      { id: 1, title: "Giới thiệu về React", duration: "15:30", completed: true },
-      { id: 2, title: "JSX và Components", duration: "22:45", completed: true },
-      { id: 3, title: "Props và State", duration: "18:20", completed: true },
-      { id: 4, title: "Event Handling", duration: "16:15", completed: false },
-      { id: 5, title: "Conditional Rendering", duration: "14:30", completed: false },
-    ]
-  },
-  {
-    id: 2,
-    title: "Cơ sở dữ liệu MySQL",
-    instructor: "PGS. Trần Thị B",
-    thumbnail: "/placeholder.svg",
-    totalVideos: 18,
-    completedVideos: 12,
-    totalDuration: "8 giờ 45 phút",
-    rating: 4.6,
-    students: 189,
-    videos: [
-      { id: 1, title: "Giới thiệu về SQL", duration: "20:15", completed: true },
-      { id: 2, title: "Tạo và quản lý bảng", duration: "25:30", completed: true },
-      { id: 3, title: "Truy vấn dữ liệu", duration: "30:45", completed: false },
-    ]
-  },
-  {
-    id: 3,
-    title: "Toán học rời rạc",
-    instructor: "TS. Lê Văn C",
-    thumbnail: "/placeholder.svg",
-    totalVideos: 30,
-    completedVideos: 5,
-    totalDuration: "15 giờ 20 phút",
-    rating: 4.5,
-    students: 324,
-    videos: [
-      { id: 1, title: "Logic mệnh đề", duration: "28:40", completed: true },
-      { id: 2, title: "Tập hợp và quan hệ", duration: "32:15", completed: false },
-    ]
-  },
-];
+interface Lesson {
+  id: number;
+  title: string;
+  duration: string;
+  completed: boolean;
+}
+
+interface Chapter {
+  id: number;
+  title: string;
+  lessonCount: number;
+  duration: string;
+  lessons: Lesson[];
+  expanded: boolean;
+}
+
+interface Note {
+  id: number;
+  timestamp: string;
+  lessonTitle: string;
+  content: string;
+  createdAt: string;
+}
+
+interface Comment {
+  id: number;
+  author: string;
+  avatar: string;
+  content: string;
+  timestamp: string;
+}
 
 const OnlineLearning = () => {
-  const [selectedCourse, setSelectedCourse] = useState(mockCourses[0]);
-  const [currentVideo, setCurrentVideo] = useState(selectedCourse.videos[0]);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [qnaOpen, setQnaOpen] = useState(false);
+  const [chapters, setChapters] = useState<Chapter[]>([
+    {
+      id: 1,
+      title: "1. IIFE, Scope, Closure",
+      lessonCount: 9,
+      duration: "01:46:18",
+      expanded: true,
+      lessons: [
+        { id: 1, title: "1. Giới thiệu khóa học", duration: "05:23", completed: true },
+        { id: 2, title: "2. Cài đặt môi trường", duration: "08:15", completed: true },
+        { id: 3, title: "3. Biến và kiểu dữ liệu", duration: "12:30", completed: true },
+        { id: 4, title: "4. Toán tử và biểu thức", duration: "10:45", completed: true },
+        { id: 5, title: "5. Câu lệnh điều kiện", duration: "15:20", completed: true },
+        { id: 6, title: "6. Vòng lặp", duration: "13:40", completed: true },
+        { id: 7, title: "7. Hàm trong JavaScript", duration: "18:25", completed: true },
+        { id: 8, title: "8. Scope và Closure", duration: "20:15", completed: true },
+        { id: 9, title: "9. Ôn tập về khái niệm Closure", duration: "01:03", completed: false },
+      ],
+    },
+    {
+      id: 2,
+      title: "2. Hoisting, Strict Mode, Data Types",
+      lessonCount: 6,
+      duration: "01:11:58",
+      expanded: false,
+      lessons: [
+        { id: 10, title: "1. Hoisting là gì?", duration: "12:30", completed: false },
+        { id: 11, title: "2. Strict Mode", duration: "08:45", completed: false },
+        { id: 12, title: "3. Kiểu dữ liệu nguyên thủy", duration: "15:20", completed: false },
+        { id: 13, title: "4. Kiểu dữ liệu tham chiếu", duration: "18:30", completed: false },
+        { id: 14, title: "5. Ép kiểu dữ liệu", duration: "10:15", completed: false },
+        { id: 15, title: "6. Bài tập thực hành", duration: "06:38", completed: false },
+      ],
+    },
+    {
+      id: 3,
+      title: "3. This, Bind, Call, Apply",
+      lessonCount: 5,
+      duration: "01:39:54",
+      expanded: false,
+      lessons: [
+        { id: 16, title: "1. This keyword", duration: "22:15", completed: false },
+        { id: 17, title: "2. Bind method", duration: "18:40", completed: false },
+        { id: 18, title: "3. Call method", duration: "16:25", completed: false },
+        { id: 19, title: "4. Apply method", duration: "14:30", completed: false },
+        { id: 20, title: "5. Thực hành tổng hợp", duration: "28:04", completed: false },
+      ],
+    },
+    {
+      id: 4,
+      title: "4. Các bài thực hành căn nhiều",
+      lessonCount: 3,
+      duration: "02:43:49",
+      expanded: true,
+      lessons: [
+        { id: 21, title: "21. Tìm hiểu về thư viện Redux", duration: "52:14", completed: false },
+        { id: 22, title: "22. Tìm hiểu về thư viện Redux", duration: "35:54", completed: true },
+        { id: 23, title: "23. Tự code thư viện build UI", duration: "53:54", completed: true },
+        { id: 24, title: "24. Code ứng dụng Todo List", duration: "01:14:01", completed: false },
+      ],
+    },
+    {
+      id: 5,
+      title: "5. Vừa giải trí vừa học",
+      lessonCount: 3,
+      duration: "01:25:10",
+      expanded: false,
+      lessons: [
+        { id: 25, title: "1. Game 1", duration: "28:30", completed: false },
+        { id: 26, title: "2. Game 2", duration: "32:20", completed: false },
+        { id: 27, title: "3. Game 3", duration: "24:20", completed: false },
+      ],
+    },
+    {
+      id: 6,
+      title: "6. Hoàn thành khóa học",
+      lessonCount: 2,
+      duration: "13:00",
+      expanded: false,
+      lessons: [
+        { id: 28, title: "1. Tổng kết", duration: "08:00", completed: false },
+        { id: 29, title: "2. Nhận chứng chỉ", duration: "05:00", completed: false },
+      ],
+    },
+  ]);
 
-  const progress = (selectedCourse.completedVideos / selectedCourse.totalVideos) * 100;
+  const [notes] = useState<Note[]>([
+    {
+      id: 1,
+      timestamp: "01:06",
+      lessonTitle: "Khái niệm Closure?",
+      content: "Một function khi nó được gọi thì nó sẽ tạo ra một phạm vì (scope) riêng biệt của hàm đó. Hiểu đơn giản là khi hàm được gọi thì nó sẽ tạo ra 1 biến hay 1 function con nằm trong hàm cha thì ở bên ngoài hàm cha sẽ không thể truy cập đến biến/function con đó => Tạo ra tính chất khép kín, bao đóng (encapsulation) => Closure",
+      createdAt: "2 ngày trước",
+    },
+    {
+      id: 2,
+      timestamp: "00:42",
+      lessonTitle: "Scope là gì?",
+      content: "Scope - Phạm vi\n- Các loại phạm vi:\n+) Global - Toàn cầu: var\n+) Code block - Khối mã: (let, const - khai báo bên trong và truy cập được bên trong), (var - khai báo bên trong, có thể truy cập từ bên ngoài)\n+) Local scope - Hàm: function (let, var, const khai báo bên trong, không thể truy cập từ bên ngoài)",
+      createdAt: "3 ngày trước",
+    },
+  ]);
+
+  const [comments] = useState<Comment[]>([
+    {
+      id: 1,
+      author: "Hoang Tu Ech",
+      avatar: "",
+      content: "****có bạn nào cứ dến nửa video là hiện cảnh báo như mình ko, mặc dù k tua dành phải qua ýtb xem vậy :(((", 
+      timestamp: "2 tháng trước",
+    },
+    {
+      id: 2,
+      author: "Nguyen Van A",
+      avatar: "",
+      content: "Video rất hay và dễ hiểu, cảm ơn thầy!",
+      timestamp: "1 tuần trước",
+    },
+  ]);
+
+  const toggleChapter = (chapterId: number) => {
+    setChapters(chapters.map(chapter => 
+      chapter.id === chapterId 
+        ? { ...chapter, expanded: !chapter.expanded }
+        : chapter
+    ));
+  };
+
+  const completedLessons = chapters.reduce((total, chapter) => 
+    total + chapter.lessons.filter(lesson => lesson.completed).length, 0
+  );
+  const totalLessons = chapters.reduce((total, chapter) => total + chapter.lessons.length, 0);
+  const progress = Math.round((completedLessons / totalLessons) * 100);
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="ml-64">
-        <TopBar />
-        <main className="p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Học trực tuyến</h1>
-              <p className="text-muted-foreground mt-2">
-                Tham gia các khóa học video từ các giảng viên hàng đầu
+      {/* Top Navigation Bar */}
+      <header className="bg-[#1a1d29] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <div className="bg-orange-500 rounded-lg px-2 py-1 font-bold text-sm">F8</div>
+            <h1 className="text-base font-medium">Lập Trình JavaScript Nâng Cao</h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="relative w-12 h-12">
+              <svg className="w-12 h-12 transform -rotate-90">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  fill="none"
+                  className="text-white/20"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 20}`}
+                  strokeDashoffset={`${2 * Math.PI * 20 * (1 - progress / 100)}`}
+                  className="text-orange-500"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold">
+                {progress}%
+              </span>
+            </div>
+            <span className="text-sm">{completedLessons}/{totalLessons} bài học</span>
+          </div>
+
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white/10"
+            onClick={() => setNotesOpen(true)}
+          >
+            <BookOpen className="h-5 w-5 mr-2" />
+            Ghi chú
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white/10"
+            onClick={() => setQnaOpen(true)}
+          >
+            <MessageSquare className="h-5 w-5 mr-2" />
+            Hỏi đáp
+          </Button>
+
+          <Button variant="ghost" className="text-white hover:bg-white/10">
+            <HelpCircle className="h-5 w-5 mr-2" />
+            Hướng dẫn
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex h-[calc(100vh-60px)]">
+        {/* Video Section */}
+        <div className="flex-1 bg-black flex flex-col">
+          <div className="relative aspect-video bg-gradient-to-br from-orange-500 via-red-500 to-purple-600">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center text-white space-y-4">
+                <h2 className="text-6xl font-bold">IIFE là gì?</h2>
+                <p className="text-2xl">JavaScript<br/>{"{Nâng cao}"}</p>
+                <p className="text-xl">fullstack.edu.vn</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Info & Controls */}
+          <div className="bg-background p-6 flex-1 overflow-auto">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-2xl font-bold mb-2">IIFE là gì?</h1>
+              
+              <div className="flex items-center justify-between mt-6">
+                <Button variant="outline" size="lg">
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  BÀI TRƯỚC
+                </Button>
+
+                <Button 
+                  variant="default" 
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  BÀI TIẾP THEO
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+
+              <div className="mt-6 flex gap-4">
+                <Button 
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setNotesOpen(true)}
+                >
+                  <BookmarkPlus className="h-4 w-4 mr-2" />
+                  Thêm ghi chú tại 00:00
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setQnaOpen(true)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Hỏi đáp
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Course Content Sidebar */}
+        <div className="w-[400px] border-l bg-background flex flex-col">
+          <div className="p-4 border-b">
+            <h2 className="font-bold text-lg">Nội dung khóa học</h2>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-2">
+              {chapters.map((chapter) => (
+                <div key={chapter.id} className="border rounded-lg">
+                  <button
+                    onClick={() => toggleChapter(chapter.id)}
+                    className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="text-left flex-1">
+                      <h3 className="font-semibold text-sm">{chapter.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {chapter.lessonCount}/{chapter.lessonCount} | {chapter.duration}
+                      </p>
+                    </div>
+                    {chapter.expanded ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
+
+                  {chapter.expanded && (
+                    <div className="border-t">
+                      {chapter.lessons.map((lesson) => (
+                        <button
+                          key={lesson.id}
+                          className="w-full p-3 px-4 flex items-center gap-3 hover:bg-muted/50 transition-colors border-b last:border-b-0"
+                        >
+                          {lesson.completed ? (
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                              <Check className="h-3 w-3 text-white" />
+                            </div>
+                          ) : (
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-muted-foreground" />
+                          )}
+                          <div className="text-left flex-1 min-w-0">
+                            <p className="text-sm truncate">{lesson.title}</p>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-shrink-0">
+                            <Clock className="h-3 w-3" />
+                            {lesson.duration}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+
+          {/* Bottom Navigation */}
+          <div className="border-t p-4">
+            <Button variant="ghost" className="w-full justify-between">
+              <span>1. IIFE, Scope, Closure</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Notes Drawer */}
+      <Sheet open={notesOpen} onOpenChange={setNotesOpen}>
+        <SheetContent className="w-[600px] sm:max-w-[600px]">
+          <SheetHeader>
+            <SheetTitle>Ghi chú của tôi</SheetTitle>
+            <SheetDescription>
+              Ghi chú giúp bạn ghi nhớ những kiến thức quan trọng
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-4">
+            <div className="flex gap-2">
+              <Select defaultValue="current">
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="current">Trong chương hiện tại</SelectItem>
+                  <SelectItem value="all">Tất cả các chương</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select defaultValue="newest">
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Mới nhất</SelectItem>
+                  <SelectItem value="oldest">Cũ nhất</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <ScrollArea className="h-[calc(100vh-300px)]">
+              <div className="space-y-4">
+                {notes.map((note) => (
+                  <div key={note.id} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="destructive" className="bg-orange-500">
+                          {note.timestamp}
+                        </Badge>
+                        <h4 className="font-semibold">{note.lessonTitle}</h4>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      {note.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            <div className="space-y-2 pt-4 border-t">
+              <Textarea
+                placeholder="Nhập ghi chú của bạn..."
+                className="min-h-[100px]"
+              />
+              <div className="flex justify-end gap-2">
+                <Button variant="outline">HỦY BỎ</Button>
+                <Button className="bg-primary">LƯU LẠI</Button>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Q&A Drawer */}
+      <Sheet open={qnaOpen} onOpenChange={setQnaOpen}>
+        <SheetContent className="w-[600px] sm:max-w-[600px]">
+          <SheetHeader>
+            <SheetTitle>Hỏi đáp</SheetTitle>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">{comments.length} bình luận</h3>
+              <p className="text-xs text-muted-foreground">
+                Nếu thấy bình luận spam, các bạn bấm report giúp admin nhé
               </p>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Video Player Section */}
-            <div className="lg:col-span-2 space-y-4">
-              <Card>
-                <CardContent className="p-0">
-                  <AspectRatio ratio={16 / 9} className="bg-muted">
-                    <div className="relative w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                      <img 
-                        src="/placeholder.svg" 
-                        alt="Video thumbnail"
-                        className="w-full h-full object-cover rounded-t-lg"
-                      />
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <Button
-                          size="lg"
-                          variant="secondary"
-                          className="h-16 w-16 rounded-full"
-                          onClick={() => setIsPlaying(!isPlaying)}
-                        >
-                          {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
-                        </Button>
-                      </div>
-                    </div>
-                  </AspectRatio>
-                  
-                  {/* Video Controls */}
-                  <div className="p-4 border-t">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold">{currentVideo.title}</h3>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Volume2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Maximize className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Progress value={45} className="h-2" />
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>5:23</span>
-                        <span>{currentVideo.duration}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Course Info */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-xl">{selectedCourse.title}</CardTitle>
-                      <CardDescription className="mt-1">
-                        Giảng viên: {selectedCourse.instructor}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary">
-                      {selectedCourse.completedVideos}/{selectedCourse.totalVideos} bài
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Tiến độ học tập</span>
-                        <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                    </div>
-                    
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{selectedCourse.totalDuration}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{selectedCourse.students} sinh viên</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span>{selectedCourse.rating}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="border rounded-lg p-3">
+              <div className="flex gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+                <Textarea
+                  placeholder="Nhập bình luận mới của bạn"
+                  className="min-h-[80px] border-0 focus-visible:ring-0 p-0"
+                />
+              </div>
             </div>
 
-            {/* Sidebar with course list and videos */}
-            <div className="space-y-4">
-              <Tabs defaultValue="playlist" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="playlist">Danh sách</TabsTrigger>
-                  <TabsTrigger value="courses">Khóa học</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="playlist" className="space-y-2">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Nội dung khóa học</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {selectedCourse.videos.map((video) => (
-                        <div
-                          key={video.id}
-                          className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
-                            currentVideo.id === video.id ? 'bg-muted border-primary' : ''
-                          }`}
-                          onClick={() => setCurrentVideo(video)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0">
-                              {video.completed ? (
-                                <CheckCircle className="h-5 w-5 text-green-500" />
-                              ) : (
-                                <PlayCircle className="h-5 w-5 text-muted-foreground" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{video.title}</p>
-                              <p className="text-xs text-muted-foreground">{video.duration}</p>
-                            </div>
-                          </div>
+            <ScrollArea className="h-[calc(100vh-350px)]">
+              <div className="space-y-4">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="border-b pb-4 last:border-b-0">
+                    <div className="flex gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-sm text-primary">
+                            {comment.author}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {comment.timestamp}
+                          </span>
                         </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="courses" className="space-y-2">
-                  {mockCourses.map((course) => (
-                    <Card 
-                      key={course.id} 
-                      className={`cursor-pointer transition-all hover:shadow-md ${
-                        selectedCourse.id === course.id ? 'ring-2 ring-primary' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedCourse(course);
-                        setCurrentVideo(course.videos[0]);
-                      }}
-                    >
-                      <CardContent className="p-3">
-                        <div className="flex gap-3">
-                          <img 
-                            src={course.thumbnail} 
-                            alt={course.title}
-                            className="w-16 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium truncate">{course.title}</h4>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {course.instructor}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                {course.completedVideos}/{course.totalVideos}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {Math.round((course.completedVideos / course.totalVideos) * 100)}%
-                              </span>
-                            </div>
-                          </div>
+                        <p className="text-sm">{comment.content}</p>
+                        <div className="flex gap-4 mt-2">
+                          <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-primary">
+                            Thích
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-primary">
+                            Phản hồi
+                          </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </TabsContent>
-              </Tabs>
-            </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
-        </main>
-      </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
