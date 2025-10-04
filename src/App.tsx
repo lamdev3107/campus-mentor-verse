@@ -9,6 +9,7 @@ import StudyMaterials from "./pages/StudyMaterials";
 import ExamPrep from "./pages/ExamPrep";
 import OnlineLearning from "./pages/OnlineLearning";
 import CourseDetail from "./pages/CourseDetail";
+import VideoLearning from "./pages/VideoLearning";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
