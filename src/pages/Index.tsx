@@ -1,6 +1,10 @@
 import { useState, useMemo } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Bell, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import DashboardStats from "@/components/DashboardStats";
 import CourseCard from "@/components/CourseCard";
 import RecentActivity from "@/components/RecentActivity";
@@ -73,53 +77,78 @@ const Index = () => {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-dashboard-bg flex">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col">
-        <TopBar />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
         
-        <main className="flex-1 p-6">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Chào mừng trở lại, Nguyễn Văn A!
-          </h1>
-          <p className="text-muted-foreground">
-            Hôm nay là ngày tuyệt vời để tiếp tục hành trình học tập của bạn.
-          </p>
-        </div>
-
-        {/* Stats */}
-        <DashboardStats />
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Courses Section */}
-          <div className="lg:col-span-2">
-            <CourseFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              courseCount={filteredCourses.length}
-            />
+        <SidebarInset className="flex-1">
+          {/* Header */}
+          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredCourses.map((course) => (
-                <CourseCard key={course.id} {...course} />
-              ))}
+            {/* Search Bar */}
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Tìm kiếm khóa học, bài tập..."
+                  className="pl-10"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <RecentActivity />
-            <QuickActions />
-          </div>
-        </div>
-        </main>
+            {/* Right Actions */}
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="icon">
+                <Bell className="w-5 h-5" />
+              </Button>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="flex-1 p-6">
+            {/* Welcome Section */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Chào mừng trở lại, Nguyễn Văn A!
+              </h1>
+              <p className="text-muted-foreground">
+                Hôm nay là ngày tuyệt vời để tiếp tục hành trình học tập của bạn.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <DashboardStats />
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Courses Section */}
+              <div className="lg:col-span-2">
+                <CourseFilter
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={setSelectedCategory}
+                  courseCount={filteredCourses.length}
+                />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredCourses.map((course) => (
+                    <CourseCard key={course.id} {...course} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <RecentActivity />
+                <QuickActions />
+              </div>
+            </div>
+          </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
