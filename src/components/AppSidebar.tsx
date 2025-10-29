@@ -29,6 +29,13 @@ const navItems = [
   { title: "Nhóm học", url: "/groups", icon: Users },
 ];
 
+const adminNavItems = [
+  { title: "Bảng điều khiển", url: "/admin/dashboard", icon: Home },
+  { title: "Quản lý phân quyền", url: "/admin/roles", icon: Settings },
+  { title: "Quản lý giảng viên", url: "/admin/teachers", icon: GraduationCap },
+  { title: "Quản lý học sinh", url: "/admin/students", icon: Users },
+];
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -56,6 +63,31 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
+                      className={({ isActive }) =>
+                        isActive
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "hover:bg-accent"
+                      }
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {!isCollapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Quản trị</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {adminNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.url}
                       className={({ isActive }) =>
                         isActive
                           ? "bg-primary/10 text-primary font-medium"

@@ -12,6 +12,10 @@ import CourseDetail from "./pages/CourseDetail";
 import VideoLearning from "./pages/VideoLearning";
 import CreateCourse from "./pages/CreateCourse";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserRolesManagement from "./pages/admin/UserRolesManagement";
+import TeacherManagement from "./pages/admin/TeacherManagement";
+import StudentManagement from "./pages/admin/StudentManagement";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +36,10 @@ const App = () => (
           <Route path="/online-learning" element={<OnlineLearning />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/create-course" element={<CreateCourse />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/roles" element={<UserRolesManagement />} />
+          <Route path="/admin/teachers" element={<TeacherManagement />} />
+          <Route path="/admin/students" element={<StudentManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
