@@ -1,4 +1,4 @@
-import { GraduationCap, Home, BookOpen, Target, Calendar, MessageSquare, Users, User, Settings, Bell } from "lucide-react";
+import { GraduationCap, Home, BookOpen, Target, Calendar, MessageSquare, Users, User, Settings, Bell, LayoutDashboard, Shield, FileText, FolderOpen } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -34,6 +34,13 @@ const adminNavItems = [
   { title: "Quản lý phân quyền", url: "/admin/roles", icon: Settings },
   { title: "Quản lý giảng viên", url: "/admin/teachers", icon: GraduationCap },
   { title: "Quản lý học sinh", url: "/admin/students", icon: Users },
+];
+
+const instructorNavItems = [
+  { title: "Trang chủ", url: "/instructor/dashboard", icon: LayoutDashboard },
+  { title: "Khóa học", url: "/instructor/courses", icon: BookOpen },
+  { title: "Đề thi", url: "/instructor/exams", icon: FileText },
+  { title: "Tài liệu", url: "/instructor/materials", icon: FolderOpen },
 ];
 
 export function AppSidebar() {
@@ -100,10 +107,36 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+        {/* Instructor Menu */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Giảng viên</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {instructorNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) =>
+                        isActive
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "hover:bg-accent"
+                      }
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {!isCollapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
+        </SidebarContent>
 
       <SidebarFooter>
         <SidebarMenu>

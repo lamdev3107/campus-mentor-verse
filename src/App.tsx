@@ -16,6 +16,10 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserRolesManagement from "./pages/admin/UserRolesManagement";
 import TeacherManagement from "./pages/admin/TeacherManagement";
 import StudentManagement from "./pages/admin/StudentManagement";
+import InstructorDashboard from "./pages/instructor/InstructorDashboard";
+import CourseManagement from "./pages/instructor/CourseManagement";
+import ExamManagement from "./pages/instructor/ExamManagement";
+import MaterialsManagement from "./pages/instructor/MaterialsManagement";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +44,10 @@ const App = () => (
           <Route path="/admin/roles" element={<UserRolesManagement />} />
           <Route path="/admin/teachers" element={<TeacherManagement />} />
           <Route path="/admin/students" element={<StudentManagement />} />
+          <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
+          <Route path="/instructor/courses" element={<CourseManagement />} />
+          <Route path="/instructor/exams" element={<ExamManagement />} />
+          <Route path="/instructor/materials" element={<MaterialsManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
