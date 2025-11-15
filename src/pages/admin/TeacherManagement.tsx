@@ -168,46 +168,52 @@ const TeacherManagement = () => {
                     <CardTitle>Danh sách giảng viên</CardTitle>
                     <CardDescription>Quản lý thông tin và hoạt động của giảng viên</CardDescription>
                   </div>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Thêm giảng viên
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Thêm giảng viên mới</DialogTitle>
-                        <DialogDescription>Nhập thông tin giảng viên</DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="name">Họ và tên</Label>
-                          <Input id="name" placeholder="Nhập họ và tên" />
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={handleImportExcel}>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import Excel
+                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Thêm giảng viên
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Thêm giảng viên mới</DialogTitle>
+                          <DialogDescription>Nhập thông tin giảng viên</DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="name">Họ và tên</Label>
+                            <Input id="name" placeholder="Nhập họ và tên" />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input id="email" type="email" placeholder="email@example.com" />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="specialty">Chuyên môn</Label>
+                            <Input id="specialty" placeholder="VD: Lập trình Web" />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="bio">Giới thiệu</Label>
+                            <Textarea id="bio" placeholder="Mô tả ngắn về giảng viên" />
+                          </div>
                         </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" placeholder="email@example.com" />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="specialty">Chuyên môn</Label>
-                          <Input id="specialty" placeholder="VD: Lập trình Web" />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="bio">Giới thiệu</Label>
-                          <Textarea id="bio" placeholder="Mô tả ngắn về giảng viên" />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button type="submit">Thêm giảng viên</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                        <DialogFooter>
+                          <Button type="submit" onClick={handleAddTeacher}>Thêm giảng viên</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="mb-4">
-                  <div className="relative">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Tìm kiếm giảng viên..."
@@ -216,11 +222,44 @@ const TeacherManagement = () => {
                       className="pl-10"
                     />
                   </div>
+                  {selectedTeachers.length > 0 && (
+                    <div className="flex gap-2">
+                      <Badge variant="secondary">{selectedTeachers.length} đã chọn</Badge>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast.success(`Kích hoạt ${selectedTeachers.length} tài khoản`);
+                          setSelectedTeachers([]);
+                        }}
+                      >
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Kích hoạt
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast.warning(`Vô hiệu hóa ${selectedTeachers.length} tài khoản`);
+                          setSelectedTeachers([]);
+                        }}
+                      >
+                        <UserX className="h-4 w-4 mr-2" />
+                        Vô hiệu hóa
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedTeachers.length === filteredTeachers.length && filteredTeachers.length > 0}
+                          onCheckedChange={handleSelectAll}
+                        />
+                      </TableHead>
                       <TableHead>Giảng viên</TableHead>
                       <TableHead>Chuyên môn</TableHead>
                       <TableHead>Khóa học</TableHead>
@@ -231,8 +270,14 @@ const TeacherManagement = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockTeachers.map((teacher) => (
+                    {filteredTeachers.map((teacher) => (
                       <TableRow key={teacher.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedTeachers.includes(teacher.id)}
+                            onCheckedChange={(checked) => handleSelectTeacher(teacher.id, checked as boolean)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar>
@@ -260,17 +305,43 @@ const TeacherManagement = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewDetails(teacher)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Xem chi tiết
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEditTeacher(teacher)}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Chỉnh sửa
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleToggleStatus(teacher)}>
+                                {teacher.status === "active" ? (
+                                  <>
+                                    <UserX className="h-4 w-4 mr-2" />
+                                    Vô hiệu hóa
+                                  </>
+                                ) : (
+                                  <>
+                                    <UserCheck className="h-4 w-4 mr-2" />
+                                    Kích hoạt
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteTeacher(teacher)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Xóa tài khoản
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
