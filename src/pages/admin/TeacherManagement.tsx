@@ -10,8 +10,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Plus, Edit, Trash2, Eye, BookOpen, Users } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Search, Plus, Edit, Trash2, Eye, MoreVertical, Upload, UserCheck, UserX } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const mockTeachers = [
   {
@@ -51,6 +59,56 @@ const mockTeachers = [
 
 const TeacherManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTeachers, setSelectedTeachers] = useState<number[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const filteredTeachers = mockTeachers.filter((teacher) =>
+    teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    teacher.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    teacher.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedTeachers(filteredTeachers.map((t) => t.id));
+    } else {
+      setSelectedTeachers([]);
+    }
+  };
+
+  const handleSelectTeacher = (teacherId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedTeachers([...selectedTeachers, teacherId]);
+    } else {
+      setSelectedTeachers(selectedTeachers.filter((id) => id !== teacherId));
+    }
+  };
+
+  const handleViewDetails = (teacher: typeof mockTeachers[0]) => {
+    toast.info(`Xem chi tiết: ${teacher.name}`);
+  };
+
+  const handleEditTeacher = (teacher: typeof mockTeachers[0]) => {
+    toast.info(`Chỉnh sửa: ${teacher.name}`);
+  };
+
+  const handleDeleteTeacher = (teacher: typeof mockTeachers[0]) => {
+    toast.error(`Xóa giảng viên: ${teacher.name}`);
+  };
+
+  const handleToggleStatus = (teacher: typeof mockTeachers[0]) => {
+    const newStatus = teacher.status === "active" ? "inactive" : "active";
+    toast.success(`${teacher.name} đã được ${newStatus === "active" ? "kích hoạt" : "vô hiệu hóa"}`);
+  };
+
+  const handleImportExcel = () => {
+    toast.info("Chức năng import Excel đang được phát triển");
+  };
+
+  const handleAddTeacher = () => {
+    toast.success("Thêm giảng viên thành công");
+    setIsAddDialogOpen(false);
+  };
 
   return (
     <SidebarProvider>
@@ -188,18 +246,8 @@ const TeacherManagement = () => {
                           </div>
                         </TableCell>
                         <TableCell>{teacher.specialty}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <BookOpen className="h-4 w-4 text-muted-foreground" />
-                            <span>{teacher.courses}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span>{teacher.students}</span>
-                          </div>
-                        </TableCell>
+                        <TableCell>{teacher.courses}</TableCell>
+                        <TableCell>{teacher.students}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <span className="text-yellow-500">★</span>
