@@ -33,12 +33,33 @@ import {
   Trash2,
   HelpCircle,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface Answer {
+  id: number;
+  text: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  id: number;
+  text: string;
+  type: "single" | "multiple";
+  answers: Answer[];
+}
 
 interface Lesson {
   id: number;
   title: string;
   duration: string;
   completed: boolean;
+  type?: "video" | "quiz";
+  quiz?: {
+    questions: Question[];
+  };
 }
 
 interface Chapter {
@@ -69,6 +90,8 @@ interface Comment {
 const OnlineLearning = () => {
   const [notesOpen, setNotesOpen] = useState(false);
   const [qnaOpen, setQnaOpen] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number[]>>({});
   const [chapters, setChapters] = useState<Chapter[]>([
     {
       id: 1,
@@ -77,15 +100,58 @@ const OnlineLearning = () => {
       duration: "01:46:18",
       expanded: true,
       lessons: [
-        { id: 1, title: "1. Giới thiệu khóa học", duration: "05:23", completed: true },
-        { id: 2, title: "2. Cài đặt môi trường", duration: "08:15", completed: true },
-        { id: 3, title: "3. Biến và kiểu dữ liệu", duration: "12:30", completed: true },
-        { id: 4, title: "4. Toán tử và biểu thức", duration: "10:45", completed: true },
-        { id: 5, title: "5. Câu lệnh điều kiện", duration: "15:20", completed: true },
-        { id: 6, title: "6. Vòng lặp", duration: "13:40", completed: true },
-        { id: 7, title: "7. Hàm trong JavaScript", duration: "18:25", completed: true },
-        { id: 8, title: "8. Scope và Closure", duration: "20:15", completed: true },
-        { id: 9, title: "9. Ôn tập về khái niệm Closure", duration: "01:03", completed: false },
+        { id: 1, title: "1. Giới thiệu khóa học", duration: "05:23", completed: true, type: "video" },
+        { id: 2, title: "2. Cài đặt môi trường", duration: "08:15", completed: true, type: "video" },
+        { id: 3, title: "3. Biến và kiểu dữ liệu", duration: "12:30", completed: true, type: "video" },
+        { id: 4, title: "4. Toán tử và biểu thức", duration: "10:45", completed: true, type: "video" },
+        { id: 5, title: "5. Câu lệnh điều kiện", duration: "15:20", completed: true, type: "video" },
+        { id: 6, title: "6. Vòng lặp", duration: "13:40", completed: true, type: "video" },
+        { id: 7, title: "7. Hàm trong JavaScript", duration: "18:25", completed: true, type: "video" },
+        { id: 8, title: "8. Scope và Closure", duration: "20:15", completed: true, type: "video" },
+        { 
+          id: 9, 
+          title: "9. Kiểm tra trắc nghiệm Closure", 
+          duration: "15:00", 
+          completed: false,
+          type: "quiz",
+          quiz: {
+            questions: [
+              {
+                id: 1,
+                text: "Closure trong JavaScript là gì?",
+                type: "single",
+                answers: [
+                  { id: 1, text: "Một hàm bên trong hàm khác", isCorrect: false },
+                  { id: 2, text: "Một hàm có khả năng truy cập biến của hàm bên ngoài", isCorrect: true },
+                  { id: 3, text: "Một cách để đóng trình duyệt", isCorrect: false },
+                  { id: 4, text: "Một kiểu dữ liệu trong JavaScript", isCorrect: false },
+                ]
+              },
+              {
+                id: 2,
+                text: "Lợi ích của Closure là gì? (Chọn nhiều đáp án đúng)",
+                type: "multiple",
+                answers: [
+                  { id: 1, text: "Tạo ra private variables", isCorrect: true },
+                  { id: 2, text: "Giúp code chạy nhanh hơn", isCorrect: false },
+                  { id: 3, text: "Tạo factory functions", isCorrect: true },
+                  { id: 4, text: "Giảm dung lượng file", isCorrect: false },
+                ]
+              },
+              {
+                id: 3,
+                text: "Trong đoạn code sau, biến nào được closure lưu trữ?\n\nfunction outer() {\n  let count = 0;\n  return function inner() {\n    count++;\n    return count;\n  }\n}",
+                type: "single",
+                answers: [
+                  { id: 1, text: "outer", isCorrect: false },
+                  { id: 2, text: "inner", isCorrect: false },
+                  { id: 3, text: "count", isCorrect: true },
+                  { id: 4, text: "Không có biến nào", isCorrect: false },
+                ]
+              }
+            ]
+          }
+        },
       ],
     },
     {
@@ -197,6 +263,46 @@ const OnlineLearning = () => {
     ));
   };
 
+  const handleAnswerChange = (questionId: number, answerId: number, isMultiple: boolean) => {
+    setQuizAnswers(prev => {
+      const current = prev[questionId] || [];
+      
+      if (isMultiple) {
+        if (current.includes(answerId)) {
+          return { ...prev, [questionId]: current.filter(id => id !== answerId) };
+        } else {
+          return { ...prev, [questionId]: [...current, answerId] };
+        }
+      } else {
+        return { ...prev, [questionId]: [answerId] };
+      }
+    });
+  };
+
+  const handleSubmitQuiz = () => {
+    if (!currentLesson?.quiz) return;
+
+    let correctCount = 0;
+    const totalQuestions = currentLesson.quiz.questions.length;
+
+    currentLesson.quiz.questions.forEach(question => {
+      const userAnswers = quizAnswers[question.id] || [];
+      const correctAnswers = question.answers
+        .filter(a => a.isCorrect)
+        .map(a => a.id)
+        .sort();
+      
+      const userAnswersSorted = [...userAnswers].sort();
+      
+      if (JSON.stringify(correctAnswers) === JSON.stringify(userAnswersSorted)) {
+        correctCount++;
+      }
+    });
+
+    const score = Math.round((correctCount / totalQuestions) * 100);
+    alert(`Bạn đã hoàn thành bài quiz!\nĐiểm số: ${score}%\nSố câu đúng: ${correctCount}/${totalQuestions}`);
+  };
+
   const completedLessons = chapters.reduce((total, chapter) => 
     total + chapter.lessons.filter(lesson => lesson.completed).length, 0
   );
@@ -275,59 +381,145 @@ const OnlineLearning = () => {
       </header>
 
       <div className="flex h-[calc(100vh-60px)]">
-        {/* Video Section */}
-        <div className="flex-1 bg-black flex flex-col">
-          <div className="relative aspect-video bg-gradient-to-br from-orange-500 via-red-500 to-purple-600">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white space-y-4">
-                <h2 className="text-6xl font-bold">IIFE là gì?</h2>
-                <p className="text-2xl">JavaScript<br/>{"{Nâng cao}"}</p>
-                <p className="text-xl">fullstack.edu.vn</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Video Info & Controls */}
-          <div className="bg-background p-6 flex-1 overflow-auto">
-            <div className="max-w-4xl mx-auto">
-              <h1 className="text-2xl font-bold mb-2">IIFE là gì?</h1>
-              
-              <div className="flex items-center justify-between mt-6">
-                <Button variant="outline" size="lg">
-                  <ChevronLeft className="h-4 w-4 mr-2" />
-                  BÀI TRƯỚC
-                </Button>
-
-                <Button 
-                  variant="default" 
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  BÀI TIẾP THEO
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
+        {/* Content Section */}
+        <div className="flex-1 bg-background flex flex-col">
+          {!currentLesson || currentLesson.type === "video" ? (
+            <>
+              <div className="relative aspect-video bg-gradient-to-br from-orange-500 via-red-500 to-purple-600">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center text-white space-y-4">
+                    <h2 className="text-6xl font-bold">IIFE là gì?</h2>
+                    <p className="text-2xl">JavaScript<br/>{"{Nâng cao}"}</p>
+                    <p className="text-xl">fullstack.edu.vn</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-6 flex gap-4">
-                <Button 
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setNotesOpen(true)}
-                >
-                  <BookmarkPlus className="h-4 w-4 mr-2" />
-                  Thêm ghi chú tại 00:00
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setQnaOpen(true)}
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Hỏi đáp
-                </Button>
+              {/* Video Info & Controls */}
+              <div className="bg-background p-6 flex-1 overflow-auto">
+                <div className="max-w-4xl mx-auto">
+                  <h1 className="text-2xl font-bold mb-2">IIFE là gì?</h1>
+                  
+                  <div className="flex items-center justify-between mt-6">
+                    <Button variant="outline" size="lg">
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      BÀI TRƯỚC
+                    </Button>
+
+                    <Button 
+                      variant="default" 
+                      size="lg"
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      BÀI TIẾP THEO
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+
+                  <div className="mt-6 flex gap-4">
+                    <Button 
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setNotesOpen(true)}
+                    >
+                      <BookmarkPlus className="h-4 w-4 mr-2" />
+                      Thêm ghi chú tại 00:00
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setQnaOpen(true)}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Hỏi đáp
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            /* Quiz Section */
+            <ScrollArea className="flex-1 p-6">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">{currentLesson.title}</h1>
+                  <p className="text-muted-foreground">Thời gian: {currentLesson.duration}</p>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Hướng dẫn làm bài</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p>• Đọc kỹ câu hỏi trước khi chọn đáp án</p>
+                    <p>• Câu hỏi có thể có một hoặc nhiều đáp án đúng</p>
+                    <p>• Nhấn "Nộp bài" khi đã hoàn thành tất cả câu hỏi</p>
+                  </CardContent>
+                </Card>
+
+                {currentLesson.quiz?.questions.map((question, index) => (
+                  <Card key={question.id}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        Câu {index + 1}: {question.text}
+                      </CardTitle>
+                      {question.type === "multiple" && (
+                        <p className="text-sm text-muted-foreground">Chọn nhiều đáp án</p>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      {question.type === "single" ? (
+                        <RadioGroup
+                          value={quizAnswers[question.id]?.[0]?.toString()}
+                          onValueChange={(value) => handleAnswerChange(question.id, parseInt(value), false)}
+                        >
+                          <div className="space-y-3">
+                            {question.answers.map((answer) => (
+                              <div key={answer.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={answer.id.toString()} id={`q${question.id}-a${answer.id}`} />
+                                <Label htmlFor={`q${question.id}-a${answer.id}`} className="flex-1 cursor-pointer">
+                                  {answer.text}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </RadioGroup>
+                      ) : (
+                        <div className="space-y-3">
+                          {question.answers.map((answer) => (
+                            <div key={answer.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`q${question.id}-a${answer.id}`}
+                                checked={quizAnswers[question.id]?.includes(answer.id)}
+                                onCheckedChange={() => handleAnswerChange(question.id, answer.id, true)}
+                              />
+                              <Label htmlFor={`q${question.id}-a${answer.id}`} className="flex-1 cursor-pointer">
+                                {answer.text}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+
+                <div className="flex items-center justify-between pt-4">
+                  <Button variant="outline" size="lg">
+                    <ChevronLeft className="h-4 w-4 mr-2" />
+                    BÀI TRƯỚC
+                  </Button>
+                  <Button size="lg" onClick={handleSubmitQuiz}>
+                    Nộp bài
+                  </Button>
+                  <Button size="lg">
+                    BÀI TIẾP THEO
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
+            </ScrollArea>
+          )}
         </div>
 
         {/* Course Content Sidebar */}
@@ -362,6 +554,7 @@ const OnlineLearning = () => {
                       {chapter.lessons.map((lesson) => (
                         <button
                           key={lesson.id}
+                          onClick={() => setCurrentLesson(lesson)}
                           className="w-full p-3 px-4 flex items-center gap-3 hover:bg-muted/50 transition-colors border-b last:border-b-0"
                         >
                           {lesson.completed ? (
@@ -372,7 +565,10 @@ const OnlineLearning = () => {
                             <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-muted-foreground" />
                           )}
                           <div className="text-left flex-1 min-w-0">
-                            <p className="text-sm truncate">{lesson.title}</p>
+                            <p className="text-sm truncate">
+                              {lesson.title}
+                              {lesson.type === "quiz" && <Badge variant="secondary" className="ml-2 text-xs">Quiz</Badge>}
+                            </p>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground flex-shrink-0">
                             <Clock className="h-3 w-3" />
