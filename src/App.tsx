@@ -20,6 +20,7 @@ import InstructorDashboard from "./pages/instructor/InstructorDashboard";
 import CourseManagement from "./pages/instructor/CourseManagement";
 import ExamManagement from "./pages/instructor/ExamManagement";
 import MaterialsManagement from "./pages/instructor/MaterialsManagement";
+import CourseDistribution from "./pages/instructor/CourseDistribution";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/instructor/courses" element={<CourseManagement />} />
           <Route path="/instructor/exams" element={<ExamManagement />} />
           <Route path="/instructor/materials" element={<MaterialsManagement />} />
+          <Route path="/instructor/distribution" element={<CourseDistribution />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
