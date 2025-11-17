@@ -41,6 +41,7 @@ const instructorNavItems = [
   { title: "Khóa học", url: "/instructor/courses", icon: BookOpen },
   { title: "Đề thi", url: "/instructor/exams", icon: FileText },
   { title: "Tài liệu", url: "/instructor/materials", icon: FolderOpen },
+  { title: "Phân phối khóa học", url: "/instructor/distribution", icon: Users },
 ];
 
 export function AppSidebar() {
