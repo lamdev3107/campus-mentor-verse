@@ -21,6 +21,7 @@ import CourseManagement from "./pages/instructor/CourseManagement";
 import ExamManagement from "./pages/instructor/ExamManagement";
 import MaterialsManagement from "./pages/instructor/MaterialsManagement";
 import CourseDistribution from "./pages/instructor/CourseDistribution";
+import PublicCourses from "./pages/PublicCourses";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/exam-prep" element={<ExamPrep />} />
           <Route path="/online-learning" element={<OnlineLearning />} />
           <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/courses" element={<PublicCourses />} />
           <Route path="/create-course" element={<CreateCourse />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/roles" element={<UserRolesManagement />} />
