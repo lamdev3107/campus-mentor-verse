@@ -24,6 +24,7 @@ import CourseDistribution from "./pages/instructor/CourseDistribution";
 import PublicCourses from "./pages/PublicCourses";
 import ExamTaking from "./pages/ExamTaking";
 import ExamResult from "./pages/ExamResult";
+import ExamPreview from "./pages/ExamPreview";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/exam-prep" element={<ExamPrep />} />
 <Route path="/exam-taking" element={<ExamTaking />} />
           <Route path="/exam-result" element={<ExamResult />} />
+          <Route path="/exam-preview" element={<ExamPreview />} />
           <Route path="/online-learning" element={<OnlineLearning />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/courses" element={<PublicCourses />} />
