@@ -26,6 +26,7 @@ import PublicCourses from "./pages/PublicCourses";
 import ExamTaking from "./pages/ExamTaking";
 import ExamResult from "./pages/ExamResult";
 import ExamPreview from "./pages/ExamPreview";
+import Schedule from "./pages/Schedule";
 
 const queryClient = new QueryClient();
 
@@ -38,7 +39,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/dashboard" element={<Index />} />
-          <Route path="/calendar" element={<Index />} />
+          <Route path="/calendar" element={<Schedule />} />
           <Route path="/discussions" element={<Index />} />
           <Route path="/groups" element={<Index />} />
           <Route path="/study-materials" element={<StudyMaterials />} />
